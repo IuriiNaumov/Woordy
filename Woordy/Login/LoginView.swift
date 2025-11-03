@@ -3,16 +3,12 @@ import UIKit
 
 struct LoginView: View {
     var body: some View {
-        VStack {
-            Image("Face").resizable().scaledToFit().frame(width: 400, height: 300)
-            
+        ZStack {
+            Color.clear
+            VStack(spacing: 0) {
+                LoginFieldsView()
+            }
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 420)
-        .background(Color("FaceColor"))
-        .clipShape(RoundedCorners(radius: 40, corners: [.bottomLeft, .bottomRight]))
-        
-        Spacer()
     }
 }
 

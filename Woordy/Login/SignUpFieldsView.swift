@@ -59,12 +59,15 @@ struct SignUpFieldsView: View {
                                         lineWidth: focusedField == .email ? 1.5 : 1)
                         )
 
-                        if let emailError = emailError, didAttemptSignUp {
-                            Text(emailError)
-                                .font(.system(size: 13))
-                                .foregroundStyle(Color.red)
-                                .padding(.horizontal, 4)
+                        ZStack(alignment: .leading) {
+                            if let emailError = emailError, didAttemptSignUp {
+                                Text(emailError)
+                                    .font(.system(size: 13))
+                                    .foregroundStyle(Color.red)
+                                    .padding(.horizontal, 4)
+                            }
                         }
+                        .frame(height: 16)
                     }
 
                     // MARK: - Password Field
@@ -214,7 +217,6 @@ struct SignUpFieldsView: View {
     SignUpFieldsView()
 }
 
-// MARK: - PasswordMaskedField и Color extension
 struct PasswordMaskedField: View {
     var placeholder: String
     @Binding var text: String
@@ -265,7 +267,7 @@ struct PasswordMaskedField: View {
 
     private var maskedString: String {
         guard !text.isEmpty else { return "" }
-        return String(repeating: "•", count: text.count)
+        return String(repeating: "*", count: text.count)
     }
 }
 

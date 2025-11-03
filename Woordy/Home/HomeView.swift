@@ -2,76 +2,78 @@ import SwiftUI
 import AVFoundation
 
 struct HomeView: View {
-    @State private var selectedCategory: String = "Slang"
-    @State private var selectedSourceTag: String? = nil
-    
-    let categories = [
-        ("Slang", Color(hexRGB: 0xE6D3F1)),
-        ("Favorites", Color(hexRGB: 0xCDE4F3)),
-        ("Movies", Color(hexRGB: 0xDDE77D))
-    ]
-    
+    @Environment(\.horizontalSizeClass) private var hSize
+    @Environment(\.colorScheme) private var colorScheme
+
+    @State private var selectedTag: String? = nil
+    @State private var selectedTab: Tab = .home
+    @State private var activeTabPulse: Tab? = nil
+    @State private var showAddWordView = false
+
+    enum Tab: String, CaseIterable, Identifiable {
+        case home, trophy, search
+        var id: String { rawValue }
+
+        var systemImage: String {
+            switch self {
+            case .home: return "house"
+            case .trophy: return "trophy"
+            case .search: return "magnifyingglass"
+            }
+        }
+    }
+
     let words: [WordCard] = [
-        WordCard(category: "Slang", title: "Sabroso", type: "noun", translation: "Вкусный", color: Color(hexRGB: 0xE6D3F1)),
-        WordCard(category: "Favorites", title: "Chido", type: "noun", translation: "Круто", color: Color(hexRGB: 0xCDE4F3))
+        WordCard(category: "Social", title: "Sabroso", type: "noun", translation: "Вкусный", color: Color(hexRGB: 0xE6D3F1)),
+        WordCard(category: "Chat", title: "Chido", type: "noun", translation: "Круто", color: Color(hexRGB: 0xCDE4F3)),
+        WordCard(category: "Movies", title: "Bonito", type: "adjective", translation: "Красивый", color: Color(hexRGB: 0xD9E764))
     ]
-    
+
+    private var filteredWords: [WordCard] {
+        guard let tag = selectedTag else { return words }
+        return words.filter { $0.category == tag }
+    }
+
+    private var isCompact: Bool { hSize == .compact }
+    private var headerTopPadding: CGFloat { isCompact ? 8 : 12 }
+    private var sectionSpacing: CGFloat { isCompact ? 18 : 24 }
+    private var horizontalPadding: CGFloat { isCompact ? 16 : 20 }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            
+        VStack(alignment: .leading, spacing: sectionSpacing) {
+
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 6) {
-                        Text("Hey, Yura")
-                            .font(.custom("Poppins-Bold", size: 28))
-                        Text("👋")
-                    }
-                    Text("Good morning")
-                        .font(.custom("Poppins-Regular", size: 15))
-                        .foregroundColor(.gray)
-                }
+                Text("Hi, Yura")
+                    .font(.custom("Poppins-Bold", size: 34))
                 Spacer()
                 Button(action: {}) {
                     Image(systemName: "gearshape")
                         .font(.system(size: 22))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
+                        .contentShape(Rectangle())
+                        .padding(8)
                 }
+                .buttonStyle(.plain)
+                .padding(.trailing, horizontalPadding)
             }
-            .padding(.horizontal)
-            .padding(.top, 12)
-            
-            // MARK: - Categories
-            HStack(spacing: 12) {
-                ForEach(categories, id: \.0) { category, color in
-                    Button(action: { selectedCategory = category }) {
-                        Text(category)
-                            .font(.custom("Poppins-SemiBold", size: 16))
-                            .foregroundColor(.black)
-                            .padding(.horizontal, 18)
-                            .padding(.vertical, 10)
-                            .background(
-                                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .fill(color)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .stroke(Color.black.opacity(selectedCategory == category ? 0.15 : 0), lineWidth: 1)
-                            )
-                            .shadow(color: Color.black.opacity(0.05), radius: 2, y: 1)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(.horizontal)
-            
-            Text("You have \(words.count) words")
-                .font(.custom("Poppins-Bold", size: 14))
+            .padding(.horizontal, horizontalPadding)
+            .padding(.top, headerTopPadding)
+            .padding(.bottom, 10)
+
+            TagsView(selectedTag: $selectedTag)
+                .padding(.horizontal, horizontalPadding)
+
+            Text(selectedTag == nil
+                 ? "You have \(filteredWords.count) words"
+                 : "You have \(filteredWords.count) words in \(selectedTag!)")
+                .font(.custom("Poppins-Regular", size: 14))
                 .foregroundColor(.gray)
-                .padding(.horizontal)
-            
+                .padding(.horizontal, horizontalPadding)
+                .padding(.bottom, 4)
+
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 16) {
-                    ForEach(words) { word in
+                LazyVStack(spacing: 16) {
+                    ForEach(filteredWords) { word in
                         WordCardView(
                             word: word.title,
                             translation: word.translation,
@@ -81,47 +83,89 @@ struct HomeView: View {
                         )
                     }
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 90)
+                .padding(.horizontal, horizontalPadding)
             }
-            
-            Spacer()
-            
+
+
+        }
+        .safeAreaInset(edge: .bottom) {
+            tabBar
+        }
+        .fullScreenCover(isPresented: $showAddWordView) {
+            AddWordView()
+        }
+    }
+
+    private var tabBar: some View {
+        ZStack {
+            HStack {
+                Spacer(minLength: 0)
+                HStack(spacing: isCompact ? 12 : 16) {
+                    ForEach(Tab.allCases) { tab in
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.18)) {
+                                activeTabPulse = tab
+                                selectedTab = tab
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                activeTabPulse = nil
+                            }
+                        } label: {
+                            let systemName = iconName(for: tab)
+                            Image(systemName: systemName)
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(selectedTab == tab ? .primary : .secondary)
+                                .frame(width: 48, height: 48)
+                                .background(
+                                    Circle()
+                                        .fill(selectedTab == tab ? Color.primary.opacity(0.08) : .clear)
+                                )
+                                .scaleEffect(activeTabPulse == tab ? 1.15 : 1.0)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 28)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 50)
+                        .fill(Color(.systemGray6))
+                )
+                Spacer(minLength: 100)
+            }
+
             HStack {
                 Spacer()
-                HStack(spacing: 36) {
-                    Image(systemName: "house.fill")
-                        .font(.system(size: 20, weight: .semibold))
-                        .frame(width: 28, height: 28)
-                    Image(systemName: "trophy")
-                        .font(.system(size: 20, weight: .semibold))
-                        .frame(width: 28, height: 28)
-                    Image(systemName: "magnifyingglass")
-                        .font(.system(size: 20, weight: .semibold))
-                        .frame(width: 28, height: 28)
-                }
-                .foregroundColor(.black)
-                Spacer()
-                Button(action: {}) {
+                Button(action: {
+                    showAddWordView = true
+                }) {
                     Image(systemName: "plus")
-                        .font(.system(size: 22, weight: .bold))
+                        .font(.system(size: 24, weight: .bold))
                         .foregroundColor(.white)
-                        .frame(width: 64, height: 44)
+                        .frame(width: 62, height: 62)
                         .background(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .fill(Color(hexRGB: 0xA78BFA))
+                            RoundedRectangle(cornerRadius: 54)
+                                .fill(Color("MainBlack"))
                         )
-                        .shadow(color: Color.black.opacity(0.2), radius: 4, y: 2)
                 }
             }
-            .padding(.horizontal, 32)
-            .padding(.bottom, 16)
+            .padding(.trailing, 18)
         }
-        .background(Color.white)
-        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .padding(.vertical, 10)
+    }
+
+    // MARK: - Helper
+    private func iconName(for tab: Tab) -> String {
+        switch tab {
+        case .search:
+            return tab.systemImage // всегда без fill
+        default:
+            return selectedTab == tab ? tab.systemImage + ".fill" : tab.systemImage
+        }
     }
 }
 
+// MARK: - WordCard Struct
 struct WordCard: Identifiable {
     let id = UUID()
     let category: String
@@ -129,15 +173,6 @@ struct WordCard: Identifiable {
     let type: String?
     let translation: String?
     let color: Color
-}
-
-extension Color {
-    init(hexRGB: UInt, alpha: Double = 1.0) {
-        let r = Double((hexRGB >> 16) & 0xFF) / 255.0
-        let g = Double((hexRGB >> 8) & 0xFF) / 255.0
-        let b = Double(hexRGB & 0xFF) / 255.0
-        self = Color(.sRGB, red: r, green: g, blue: b, opacity: alpha)
-    }
 }
 
 #Preview {

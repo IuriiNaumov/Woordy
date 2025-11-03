@@ -1,3 +1,6 @@
+import SwiftUI
+import UIKit
+
 struct RoundedInputField: View {
     enum FieldStyle {
         case plain
@@ -13,13 +16,13 @@ struct RoundedInputField: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(Color(red: 0xD4/255.0, green: 0xD4/255.0, blue: 0xD4/255.0), lineWidth: 3)
+                .stroke(Color("MainGrey"), lineWidth: 3)
                 .background(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .fill(Color(.systemBackground))
                 )
 
-            HStack(spacing: 12) {
+            HStack(spacing: 4) {
                 Group {
                     if style == .secure && isSecureHidden {
                         SecureField(placeholder, text: $text)
@@ -39,14 +42,14 @@ struct RoundedInputField: View {
                     Button(action: { isSecureHidden.toggle() }) {
                         Image(systemName: isSecureHidden ? "eye.slash" : "eye")
                             .foregroundStyle(.primary)
-                            .font(.custom("Poppins-SemiBold", size: 20))
+                            .font(.custom("Poppins-Regular", size: 18))
                             .padding(6)
                     }
                     .buttonStyle(.plain)
                 }
             }
             .padding(.horizontal, 18)
-            .padding(.vertical, 16)
+            .padding(.vertical, 14)
         }
         .frame(height: 72)
     }
