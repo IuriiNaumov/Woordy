@@ -13,7 +13,7 @@ func translateWithGPT(
     targetLang: String = "Russian"
 ) async throws -> GPTTranslationResult {
 
-    let apiKey = "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"
+    let apiKey = ""
     let url = URL(string: "https://api.openai.com/v1/chat/completions")!
 
     var request = URLRequest(url: url)
