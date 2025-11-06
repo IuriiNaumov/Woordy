@@ -2,27 +2,32 @@ import SwiftUI
 
 struct Loader: View {
     @State private var phase: CGFloat = 0
+    private let dotCount = 3
+    private let dotSize: CGFloat = 10
+    private let spacing: CGFloat = 8
 
     var body: some View {
-        HStack(spacing: 8) {
-            ForEach(0..<3) { i in
+        HStack(spacing: spacing) {
+            ForEach(0..<dotCount, id: \.self) { i in
                 Circle()
                     .fill(Color.white)
-                    .frame(width: 10, height: 10)
+                    .frame(width: dotSize, height: dotSize)
                     .scaleEffect(scale(for: i))
                     .opacity(Double(scale(for: i)))
-                    .animation(
-                        .easeInOut(duration: 0.6)
-                            .repeatForever(autoreverses: true)
-                            .delay(Double(i) * 0.15),
-                        value: phase
-                    )
             }
         }
-        .onAppear { phase += 1 }
+        .onAppear {
+            withAnimation(
+                .easeInOut(duration: 0.6)
+                .repeatForever(autoreverses: true)
+            ) {
+                phase = .pi * 2
+            }
+        }
     }
 
     private func scale(for index: Int) -> CGFloat {
-        return 0.6 + 0.4 * sin(phase + CGFloat(index) * 1.3)
+        let offset = CGFloat(index) * 0.6
+        return 0.6 + 0.4 * sin(phase + offset)
     }
 }

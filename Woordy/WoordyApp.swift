@@ -20,7 +20,6 @@ struct WoordyApp: App {
     }
 
     private func warmUpKeyboard() {
-        // Прогреваем подсистему клавиатуры (ускоряет первое появление TextField)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let textField = UITextField()
             UIApplication.shared.windows.first?.addSubview(textField)

@@ -47,12 +47,6 @@ private struct ShimmerModifier: ViewModifier {
 }
 
 public extension View {
-    /// Applies a shimmering effect to the view.
-    /// - Parameters:
-    ///   - active: A Boolean value that determines whether the shimmer effect is active. Default is `true`.
-    ///   - speed: The speed of the shimmer animation in seconds. Default is `1.25`.
-    ///   - blendMode: The blend mode used for the shimmer effect. Default is `.screen`.
-    ///   - opacity: The base opacity of the content when shimmering. Default is `0.6`.
     func shimmering(active: Bool = true, speed: Double = 1.25, blendMode: BlendMode = .screen, opacity: Double = 0.6) -> some View {
         modifier(ShimmerModifier(active: active, speed: speed, blendMode: blendMode, opacity: opacity))
     }

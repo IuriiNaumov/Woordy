@@ -23,14 +23,12 @@ struct SignUpFieldsView: View {
         GeometryReader { geo in
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 28) {
-                    // MARK: - Title
                     Text("Sign Up")
                         .font(.custom("Poppins-Bold", size: 44))
                         .foregroundStyle(Color(.label))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 16)
                     
-                    // MARK: - Email Field
                     VStack(alignment: .leading, spacing: 8) {
                         VStack(spacing: 0) {
                             TextField("Email", text: $email)
@@ -70,7 +68,6 @@ struct SignUpFieldsView: View {
                         .frame(height: 16)
                     }
 
-                    // MARK: - Password Field
                     VStack(spacing: 8) {
                         VStack(spacing: 0) {
                             PasswordMaskedField(placeholder: "Password", text: $password)
@@ -92,7 +89,6 @@ struct SignUpFieldsView: View {
                         )
                     }
 
-                    // MARK: - Terms Checkbox
                     HStack(spacing: 12) {
                         Text("I agree with term of use")
                             .font(.custom("Poppins-Regular", size: 18))
@@ -121,7 +117,6 @@ struct SignUpFieldsView: View {
                         .buttonStyle(.plain)
                     }
 
-                    // MARK: - Sign Up Button
                     Button(action: {
                         didAttemptSignUp = true
                         emailError = email.isEmpty || isEmailValid ? nil : "Email is not valid"
@@ -140,7 +135,6 @@ struct SignUpFieldsView: View {
                     .opacity(isFormValid ? 1 : 0.6)
                     .disabled(!isFormValid)
 
-                    // MARK: - OR Separator
                     HStack {
                         Rectangle()
                             .frame(height: 1)
@@ -154,10 +148,9 @@ struct SignUpFieldsView: View {
                     }
                     .padding(.vertical, 4)
 
-                    // MARK: - Google Button
                     Button(action: {}) {
                         HStack {
-                            Image(systemName: "globe") // заменишь на иконку Google
+                            Image(systemName: "globe")
                                 .font(.system(size: 18))
                             Text("Sign up with Google")
                                 .font(.custom("Poppins-Regular", size: 16))
@@ -172,7 +165,6 @@ struct SignUpFieldsView: View {
                     }
                     .buttonStyle(.plain)
 
-                    // MARK: - Bottom text
                     HStack(spacing: 6) {
                         Text("Already have an account?")
                             .font(.custom("Poppins-Regular", size: 16))

@@ -31,7 +31,6 @@ struct LoginFieldsView: View {
                             .foregroundStyle(Color(.label))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        // Email field
                         VStack(alignment: .leading, spacing: 8) {
                             VStack(spacing: 0) {
                                 TextField("Email", text: $email)
@@ -69,7 +68,6 @@ struct LoginFieldsView: View {
                             .frame(height: 16)
                         }
                         
-                        // Password field
                         VStack(spacing: 8) {
                             VStack(spacing: 0) {
                                 LoginPasswordField(placeholder: "Password", text: $password)

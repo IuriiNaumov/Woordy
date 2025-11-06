@@ -9,6 +9,7 @@ struct StoredWord: Identifiable, Codable, Equatable {
     var example: String?
     var comment: String?
     var tag: String?
+    var dateAdded: Date = Date()
 
     init(
         id: UUID = UUID(),
@@ -17,7 +18,8 @@ struct StoredWord: Identifiable, Codable, Equatable {
         translation: String?,
         example: String?,
         comment: String? = nil,
-        tag: String? = nil
+        tag: String? = nil,
+        dateAdded: Date = Date()
     ) {
         self.id = id
         self.word = word
@@ -26,6 +28,7 @@ struct StoredWord: Identifiable, Codable, Equatable {
         self.example = example
         self.comment = comment
         self.tag = tag
+        self.dateAdded = dateAdded
     }
 }
 
@@ -34,13 +37,19 @@ final class WordsStore: ObservableObject {
         didSet { saveAsync() }
     }
 
+    @Published private(set) var totalWordsAdded: Int = 0 {
+        didSet { saveAsync() }
+    }
+
     private let storageKey = "WordsStore.words"
+    private let totalKey = "WordsStore.totalWordsAdded"
 
     init() { loadAsync() }
 
     func add(_ word: StoredWord) {
         DispatchQueue.main.async {
             self.words.append(word)
+            self.totalWordsAdded += 1
         }
     }
 
@@ -54,21 +63,33 @@ final class WordsStore: ObservableObject {
 
     private func loadAsync() {
         DispatchQueue.global(qos: .background).async {
-            guard let data = UserDefaults.standard.data(forKey: self.storageKey) else { return }
-            if let decoded = try? JSONDecoder().decode([StoredWord].self, from: data) {
-                DispatchQueue.main.async {
-                    self.words = decoded
-                }
+            let defaults = UserDefaults.standard
+
+            var decodedWords: [StoredWord] = []
+            if let data = defaults.data(forKey: self.storageKey),
+               let decoded = try? JSONDecoder().decode([StoredWord].self, from: data) {
+                decodedWords = decoded
+            }
+
+            let total = defaults.integer(forKey: self.totalKey)
+
+            DispatchQueue.main.async {
+                self.words = decodedWords
+                self.totalWordsAdded = total
             }
         }
     }
 
     private func saveAsync() {
         let copy = words
+        let total = totalWordsAdded
+
         DispatchQueue.global(qos: .background).async {
+            let defaults = UserDefaults.standard
             if let data = try? JSONEncoder().encode(copy) {
-                UserDefaults.standard.set(data, forKey: self.storageKey)
+                defaults.set(data, forKey: self.storageKey)
             }
+            defaults.set(total, forKey: self.totalKey)
         }
     }
 }

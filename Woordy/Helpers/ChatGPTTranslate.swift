@@ -24,7 +24,7 @@ func translateWithGPT(
     targetLang: String = "Russian"
 ) async throws -> GPTTranslationResult {
 
-    let apiKey = ""
+    let apiKey = "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"
     let url = URL(string: "https://api.openai.com/v1/chat/completions")!
 
     var request = URLRequest(url: url)
@@ -58,7 +58,6 @@ func translateWithGPT(
 
     if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
         let raw = String(data: data, encoding: .utf8) ?? "No body"
-        print("🚫 HTTP error \(http.statusCode):\n\(raw)")
         throw NSError(domain: "OpenAI", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: raw])
     }
 
@@ -67,13 +66,11 @@ func translateWithGPT(
 
 
     if let err = decoded.error {
-        print("🚫 API error:", err.message)
         throw NSError(domain: "OpenAI", code: -1, userInfo: [NSLocalizedDescriptionKey: err.message])
     }
 
     guard let message = decoded.choices?.first?.message.content else {
         let text = String(data: data, encoding: .utf8) ?? "Empty"
-        print("⚠️ Unexpected response:", text)
         throw NSError(domain: "OpenAI", code: -2, userInfo: [NSLocalizedDescriptionKey: "Empty content or invalid structure"])
     }
 
@@ -86,8 +83,6 @@ func translateWithGPT(
         let result = try JSONDecoder().decode(GPTTranslationResult.self, from: jsonData)
         return result
     } catch {
-        print("❌ JSON decode error:", error)
-        print("🧾 Raw content:", cleaned)
         throw error
     }
 }

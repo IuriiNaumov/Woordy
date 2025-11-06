@@ -9,7 +9,6 @@ struct WordCardView: View, Equatable {
     let tag: String?
     let onDelete: () -> Void
 
-    // Для Equatable
     static func == (lhs: WordCardView, rhs: WordCardView) -> Bool {
         lhs.word == rhs.word &&
         lhs.translation == rhs.translation &&
@@ -25,14 +24,14 @@ struct WordCardView: View, Equatable {
 
     private var backgroundColor: Color {
         switch tag {
-        case "Social": return Color(red: 0.95, green: 0.80, blue: 1.00)
-        case "Chat": return Color(red: 0.80, green: 0.90, blue: 1.00)
-        case "Apps": return Color(red: 0.85, green: 1.00, blue: 0.85)
-        case "Street": return Color(red: 1.00, green: 0.90, blue: 0.75)
-        case "Travel": return Color(red: 1.00, green: 0.95, blue: 0.75)
-        case "Movies": return Color(red: 1.00, green: 0.80, blue: 0.80)
-        case "Work": return Color(red: 0.88, green: 0.88, blue: 0.95)
-        default: return Color(.systemGray6)
+        case "Social": return Color(hexRGB: 0xFFDFA4)
+        case "Chat":   return Color(hexRGB: 0xB9E3FF)
+        case "Apps":   return Color(hexRGB: 0xC6F6D5)
+        case "Street": return Color(hexRGB: 0xFFC6C9)
+        case "Movies": return Color(hexRGB: 0xE4D2FF)
+        case "Travel": return Color(hexRGB: 0xFFF1B2)
+        case "Work":   return Color(hexRGB: 0xBDF4F2)
+        default:       return Color(hexRGB: 0xFFF8E7)
         }
     }
 
@@ -44,14 +43,14 @@ struct WordCardView: View, Equatable {
                         .font(.custom("Poppins-Medium", size: 14))
                         .padding(.horizontal, 28)
                         .padding(.vertical, 4)
-                        .background(Color.gray.opacity(0.2))
+                        .background(Color("MainGrey").opacity(0.2))
                         .clipShape(Capsule())
                 }
 
                 HStack(alignment: .center, spacing: 8) {
                     Text(word)
-                        .font(.custom("Poppins-Bold", size: 22))
-                        .foregroundColor(.black)
+                        .font(.custom("Poppins-Bold", size: 24))
+                        .foregroundColor(Color("MainBlack"))
                     Spacer()
                     Button(action: playAudio) {
                         SoundWavesView(isPlaying: isPlaying)
@@ -64,25 +63,25 @@ struct WordCardView: View, Equatable {
                 if let type = type {
                     Text(type)
                         .font(.custom("Poppins-Regular", size: 16))
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color("MainGrey"))
                 }
 
                 if let translation = translation {
                     Text(translation)
                         .font(.custom("Poppins-Regular", size: 16))
-                        .foregroundColor(.black.opacity(0.9))
+                        .foregroundColor(Color("MainBlack"))
                 }
 
                 if let _ = example {
                     Text(highlightedExample)
                         .font(.custom("Poppins-Regular", size: 16))
-                        .foregroundColor(.black.opacity(0.9))
+                        .foregroundColor(Color("MainBlack"))
                 }
 
                 if let comment = comment, !comment.isEmpty {
                     Text(comment)
                         .font(.custom("Poppins-Regular", size: 14))
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color("MainGrey"))
                         .padding(.top, 4)
                 }
 
@@ -102,7 +101,7 @@ struct WordCardView: View, Equatable {
                     HStack(alignment: .center, spacing: 8) {
                         Text(word)
                             .font(.custom("Poppins-Bold", size: 22))
-                            .foregroundColor(.black)
+                            .foregroundColor(Color("MainBlack"))
                         Spacer()
                         Button(action: playAudio) {
                             SoundWavesView(isPlaying: isPlaying)
@@ -115,7 +114,7 @@ struct WordCardView: View, Equatable {
                     if let translation = translation {
                         Text(translation)
                             .font(.custom("Poppins-Regular", size: 16))
-                            .foregroundColor(.black.opacity(0.9))
+                            .foregroundColor(Color("MainBlack"))
                             .multilineTextAlignment(.leading)
                     }
 
@@ -137,7 +136,7 @@ struct WordCardView: View, Equatable {
         .background(backgroundColor)
         .cornerRadius(16)
         .scaleEffect(isExpanded ? 1.02 : 0.98)
-        .shadow(color: .black.opacity(isExpanded ? 0.15 : 0.05),
+        .shadow(color: Color("MainBlack").opacity(isExpanded ? 0.15 : 0.05),
                 radius: isExpanded ? 12 : 4,
                 x: 0, y: isExpanded ? 6 : 2)
         .animation(.interpolatingSpring(stiffness: 100, damping: 12), value: isExpanded)
