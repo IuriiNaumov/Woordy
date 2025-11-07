@@ -4,6 +4,7 @@ import AVFoundation
 struct HomeView: View {
     @Environment(\.horizontalSizeClass) private var hSize
     @EnvironmentObject private var store: WordsStore
+    @StateObject private var golden = GoldenWordsStore()
 
     @State private var showAddWordView = false
     @State private var selectedTab: Tab = .home
@@ -49,34 +50,38 @@ struct HomeView: View {
                     .tabItem { icon(for: .list) }
                     .tag(Tab.list)
 
+                // "Пустая" вкладка Add, чтобы ловить нажатие
                 Color.clear
                     .tabItem { icon(for: .add) }
                     .tag(Tab.add)
             }
             .tint(Color("MainBlack"))
-            .onChange(of: selectedTab) { oldValue, newValue in
+            .onChange(of: selectedTab) { _, newValue in
                 if newValue == .add {
-                    selectedTab = oldValue ?? .home
+                    // при нажатии на плюс открываем AddWordView
                     withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
                         showAddWordView = true
                     }
+                    selectedTab = .home
                 }
             }
-        }
-        .sheet(isPresented: $showAddWordView) {
-            AddWordView(store: store)
-                .transaction { $0.disablesAnimations = true }
+            .sheet(isPresented: $showAddWordView) {
+                AddWordView(store: store)
+                    .transaction { $0.disablesAnimations = true }
+            }
+            .environmentObject(golden)
         }
     }
 
     private var mainContent: some View {
         ScrollView(showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 20) {
-
+            VStack(spacing: 32) {
                 ProfileHeaderView()
-
                 StatsView()
-                    .padding(.top, 4)
+
+                GoldenWordsView()
+                    .environmentObject(golden)
+                    .padding(.horizontal, horizontalPadding)
 
                 if !recentWords.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
@@ -101,11 +106,9 @@ struct HomeView: View {
                     }
                     .padding(.top, 8)
                 } else {
-                    Text("No recent words yet 😌")
-                        .font(.custom("Poppins-Regular", size: 14))
-                        .foregroundColor(Color("MainGrey"))
-                        .padding(.horizontal, horizontalPadding)
-                        .padding(.top, 8)
+                    EmptyListView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding(.top, 40)
                 }
             }
             .padding(.bottom, 60)
@@ -126,5 +129,6 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView().environmentObject(WordsStore())
+    HomeView()
+        .environmentObject(WordsStore())
 }

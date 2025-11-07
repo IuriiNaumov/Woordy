@@ -5,13 +5,14 @@ struct TagsView: View {
     var compact: Bool = false
 
     static let allTags: [(name: String, color: Color)] = [
+        ("Golden", Color(hexRGB: 0xFFC107)),
         ("Social", Color(hexRGB: 0xFFDFA4)),
         ("Chat",   Color(hexRGB: 0xB9E3FF)),
         ("Apps",   Color(hexRGB: 0xC6F6D5)),
         ("Street", Color(hexRGB: 0xFFC6C9)),
         ("Movies", Color(hexRGB: 0xE4D2FF)),
         ("Travel", Color(hexRGB: 0xFFF1B2)),
-        ("Work",   Color(hexRGB: 0xBDF4F2))
+        ("Work",   Color(hexRGB: 0xBDF4F2)),
     ]
 
     var body: some View {
@@ -30,21 +31,36 @@ struct TagsView: View {
                         VStack(spacing: 6) {
                             Text(tag.name)
                                 .font(.custom("Poppins-Medium", size: compact ? 13 : 15))
-                                .foregroundColor(isSelected ? darkerText : Color("MainBlack"))
+                                .foregroundColor(
+                                    tag.name == "Golden"
+                                    ? (isSelected ? Color.white : darkerText)
+                                    : (isSelected ? darkerText : Color("MainBlack"))
+                                )
                         }
                         .frame(minWidth: 100)
                         .padding(.vertical, 12)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(baseColor.opacity(isSelected ? 1.0 : 0.25))
+                                .fill(
+                                    tag.name == "Golden"
+                                    ? baseColor.opacity(isSelected ? 1.0 : 0.35)
+                                    : baseColor.opacity(isSelected ? 1.0 : 0.25)
+                                )
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .stroke(baseColor.opacity(isSelected ? 0.45 : 0.35), lineWidth: 1.5)
+                                .stroke(
+                                    tag.name == "Golden"
+                                    ? baseColor.opacity(isSelected ? 0.55 : 0.35)
+                                    : baseColor.opacity(isSelected ? 0.45 : 0.35),
+                                    lineWidth: 1.5
+                                )
                         )
-                        .shadow(color: baseColor.opacity(isSelected ? 0.4 : 0.25),
-                                radius: isSelected ? 8 : 5,
-                                x: 0, y: isSelected ? 4 : 2)
+                        .shadow(
+                            color: baseColor.opacity(isSelected ? 0.45 : 0.25),
+                            radius: isSelected ? 8 : 5,
+                            x: 0, y: isSelected ? 4 : 2
+                        )
                         .scaleEffect(isSelected ? 1.05 : 1.0)
                         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: isSelected)
                     }
@@ -65,7 +81,7 @@ struct TagsView: View {
             .padding(.horizontal)
 
         TagsView(selectedTag: .constant(nil))
-        TagsView(selectedTag: .constant("Travel"))
+        TagsView(selectedTag: .constant("Golden"))
 
         Spacer()
     }
