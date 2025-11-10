@@ -20,6 +20,7 @@ struct SuggestedWord: Identifiable, Codable, Equatable {
         self.type = type
         self.example = example
     }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = UUID()
@@ -61,33 +62,36 @@ struct SuggestionsContainer: Codable {
     let suggestions: [SuggestedWord]
 }
 
+@MainActor
 func fetchSuggestionsWithTopic(
     words: [String],
-    language: String = "Spanish",
-    translationLanguage: String = "Russian"
+    languageStore: LanguageStore
 ) async throws -> (topic: String?, suggestions: [SuggestedWord]) {
+    
+    let language = languageStore.learningLanguage
+    let translationLanguage = languageStore.nativeLanguage
 
 
     let url = URL(string: "https://api.openai.com/v1/chat/completions")!
     let wordsList = words.joined(separator: ", ")
 
     let prompt = """
-    You are a vocabulary assistant helping users learn Spanish.
+    You are a vocabulary assistant helping users learn \(language).
 
-    Here is my current list of Spanish words: \(wordsList)
+    Here is my current list of \(language) words: \(wordsList)
 
     1. Identify the general topic or theme of these words (for example: food, travel, emotions, everyday life, etc.).
-    2. Suggest two NEW Spanish words that:
+    2. Suggest two NEW \(language) words that:
        - are thematically related to my list,
        - are NOT already in the list,
-       - fit the A2–B1 level for Spanish learners,
+       - fit the A2–B1 level for language learners,
        - are commonly used in natural conversation.
 
     For each suggested word, return:
-    - "word": the Spanish word,
-    - "translation": its translation into Russian,
+    - "word": the \(language) word,
+    - "translation": its translation into \(translationLanguage),
     - "type": part of speech (noun, verb, adjective, etc.),
-    - "example": one natural Spanish sentence using that word.
+    - "example": one natural \(language) sentence using that word.
 
     Respond ONLY with JSON in this format:
     {
@@ -108,6 +112,7 @@ func fetchSuggestionsWithTopic(
       ]
     }
     """
+
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -122,6 +127,7 @@ func fetchSuggestionsWithTopic(
             ["role": "user", "content": prompt]
         ]
     ]
+
     request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
     let (data, response) = try await URLSession.shared.data(for: request)

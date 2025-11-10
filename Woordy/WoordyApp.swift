@@ -4,6 +4,8 @@ import AVFoundation
 @main
 struct WoordyApp: App {
     @StateObject private var store = WordsStore()
+    @StateObject private var golden = GoldenWordsStore()
+    @StateObject private var languageStore = LanguageStore()
 
     init() {
         warmUpKeyboard()
@@ -14,8 +16,10 @@ struct WoordyApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            ContentView()
                 .environmentObject(store)
+                .environmentObject(golden)
+                .environmentObject(languageStore)
         }
     }
 
@@ -37,11 +41,8 @@ struct WoordyApp: App {
 
     private func warmUpGPT() {
         Task.detached(priority: .background) {
-            _ = try? await translateWithGPT(
-                word: "hola",
-                sourceLang: "Spanish",
-                targetLang: "Russian"
-            )
+            let languageStore = LanguageStore()
+            _ = try? await translateWithGPT(word: "hola", languageStore: languageStore)
         }
     }
 

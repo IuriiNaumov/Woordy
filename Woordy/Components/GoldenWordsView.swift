@@ -4,9 +4,10 @@ struct GoldenWordsView: View {
     @EnvironmentObject private var store: WordsStore
     @EnvironmentObject private var golden: GoldenWordsStore
 
-    private let gold = Color(.accentGold)
-    private let darkGold = Color(hex: "#E0A600")
-    private let midTextGold = Color(hex: "#966000")
+    private let gold = Color(hex: "#FCDD9D")
+    private let darkGold = Color(hex: "#D99B00")
+    private let midTextGold = Color(hex: "#7B5200")
+    private let titleGold = Color(hex: "#5A3C00")
 
     var body: some View {
         if golden.isLoading || !golden.goldenWords.isEmpty {
@@ -27,22 +28,22 @@ struct GoldenWordsView: View {
                             VStack(alignment: .leading, spacing: 10) {
                                 Text(word.word.capitalized)
                                     .font(.custom("Poppins-Bold", size: 24))
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.mainBlack)
 
                                 Text(word.translation)
                                     .font(.custom("Poppins-Regular", size: 16))
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.mainGrey)
 
                                 if let example = word.example {
                                     Text(example)
                                         .font(.custom("Poppins-Regular", size: 16))
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.mainBlack)
                                 }
 
                                 HStack {
                                     Button {
                                         withAnimation(.spring()) {
-                                            golden.accept(word, store: store)
+                                            golden.accept(word, store: store, languageStore: LanguageStore())
                                         }
                                     } label: {
                                         HStack(spacing: 6) {

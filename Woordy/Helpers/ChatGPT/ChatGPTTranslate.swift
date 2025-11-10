@@ -18,16 +18,18 @@ struct APIError: Codable {
     let type: String?
 }
 
+@MainActor
 func translateWithGPT(
     word: String,
-    sourceLang: String = "Spanish",
-    targetLang: String = "Russian"
+    languageStore: LanguageStore
 ) async throws -> GPTTranslationResult {
+    
+    let sourceLang = languageStore.learningLanguage
+    let targetLang = languageStore.nativeLanguage
+    
 
-
- 
     let url = URL(string: "https://api.openai.com/v1/chat/completions")!
-
+    
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -56,15 +58,12 @@ func translateWithGPT(
 
     let (data, response) = try await URLSession.shared.data(for: request)
 
-
     if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
         let raw = String(data: data, encoding: .utf8) ?? "No body"
         throw NSError(domain: "OpenAI", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: raw])
     }
 
-
     let decoded = try JSONDecoder().decode(OpenAIResponse.self, from: data)
-
 
     if let err = decoded.error {
         throw NSError(domain: "OpenAI", code: -1, userInfo: [NSLocalizedDescriptionKey: err.message])
@@ -80,12 +79,7 @@ func translateWithGPT(
         throw NSError(domain: "ChatGPT", code: -3, userInfo: [NSLocalizedDescriptionKey: "Invalid UTF8"])
     }
 
-    do {
-        let result = try JSONDecoder().decode(GPTTranslationResult.self, from: jsonData)
-        return result
-    } catch {
-        throw error
-    }
+    return try JSONDecoder().decode(GPTTranslationResult.self, from: jsonData)
 }
 
 private func sanitizeJSON(_ text: String) -> String {

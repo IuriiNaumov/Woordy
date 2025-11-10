@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AddWordView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var languageStore: LanguageStore
     @ObservedObject var store: WordsStore
 
     @State private var word = ""
@@ -117,7 +118,8 @@ struct AddWordView: View {
                     }
 
                     AddWordButton(
-                        title: isAdding ? "Adding..." : "Add", isDisabled: word.trimmingCharacters(in: .whitespaces).isEmpty
+                        title: isAdding ? "Adding..." : "Add",
+                        isDisabled: word.trimmingCharacters(in: .whitespaces).isEmpty
                     ) {
                         await addWord()
                     }
@@ -135,8 +137,6 @@ struct AddWordView: View {
             translationPlaceholder = translationPlaceholders.randomElement() ?? "Enter translation"
             commentPlaceholder = commentPlaceholders.randomElement() ?? "Enter a comment"
 
-            _ = UIFont(name: "Poppins-Bold", size: 12)
-            _ = UIFont(name: "Poppins-Regular", size: 12)
             if !didAppear { didAppear = true }
         }
     }
@@ -146,33 +146,32 @@ struct AddWordView: View {
         isAdding = true
 
         do {
-            let result = try await translateWithGPT(
-                word: word,
-                sourceLang: "Spanish",
-                targetLang: "Russian"
-            )
-
+            let result = try await translateWithGPT(word: word, languageStore: languageStore)
             let russianType = translatePartOfSpeechToRussian(result.type)
+
             await MainActor.run {
                 let newWord = StoredWord(
                     word: word,
                     type: russianType,
-                    translation: result.translation,
+                    translation: result.translation.isEmpty ? translation : result.translation,
                     example: result.example,
                     comment: comment,
-                    tag: selectedTag
+                    tag: selectedTag,
+                    fromLanguage: languageStore.nativeLanguage,
+                    toLanguage: languageStore.learningLanguage
                 )
                 store.add(newWord)
                 dismiss()
             }
-        } catch {}
+        } catch {
+            print("⚠️ Translation error: \(error.localizedDescription)")
+        }
 
         await MainActor.run { isAdding = false }
     }
 
     private func translatePartOfSpeechToRussian(_ type: String?) -> String {
         guard let type = type?.lowercased() else { return "" }
-
         switch type {
         case "verb": return "глагол"
         case "phrase": return "фраза"
@@ -191,4 +190,5 @@ struct AddWordView: View {
 
 #Preview {
     AddWordView(store: WordsStore())
+        .environmentObject(LanguageStore())
 }

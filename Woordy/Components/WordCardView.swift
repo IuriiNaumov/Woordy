@@ -32,20 +32,13 @@ struct WordCardView: View, Equatable {
 
     private var backgroundColor: Color {
         switch tag {
-        case "Social": return Color(.accentYellow)
         case "Chat":   return Color(.accentBlue)
-        case "Apps":   return Color(.accentGreen)
+        case "Travel": return Color(.accentGreen)
         case "Street": return Color(.accentPink)
         case "Movies": return Color(.accentPurple)
-        case "Travel": return Color(.accentYellow)
-        case "Work":   return Color(.accentMint)
         case "Golden": return Color(.accentGold)
         default:       return Color(.defaultCard)
         }
-    }
-
-    private var textColor: Color {
-        Color(.black)
     }
 
     var body: some View {
@@ -64,7 +57,7 @@ struct WordCardView: View, Equatable {
                 HStack(alignment: .center, spacing: 8) {
                     Text(word)
                         .font(.custom("Poppins-Bold", size: 24))
-                        .foregroundColor(textColor)
+                        .foregroundColor(.mainBlack)
 
                     Spacer()
                     Button(action: playAudio) {
@@ -85,13 +78,13 @@ struct WordCardView: View, Equatable {
                 if let translation = translation {
                     Text(translation)
                         .font(.custom("Poppins-Regular", size: 16))
-                        .foregroundColor(textColor)
+                        .foregroundColor(.mainBlack)
                 }
 
                 if let _ = example {
                     Text(highlightedExample)
                         .font(.custom("Poppins-Regular", size: 16))
-                        .foregroundColor(textColor)
+                        .foregroundColor(.mainBlack)
                 }
 
                 if let comment = comment, !comment.isEmpty {
@@ -117,7 +110,7 @@ struct WordCardView: View, Equatable {
                     HStack(alignment: .center, spacing: 8) {
                         Text(word)
                             .font(.custom("Poppins-Bold", size: 22))
-                            .foregroundColor(textColor)
+                            .foregroundColor(.mainBlack)
                         Spacer()
                         Button(action: playAudio) {
                             SoundWavesView(isPlaying: isPlaying)
@@ -131,7 +124,7 @@ struct WordCardView: View, Equatable {
                     if let translation = translation {
                         Text(translation)
                             .font(.custom("Poppins-Regular", size: 16))
-                            .foregroundColor(textColor)
+                            .foregroundColor(.mainBlack)
                             .multilineTextAlignment(.leading)
                     }
 
@@ -213,6 +206,15 @@ struct WordCardView: View, Equatable {
             example: "La fiesta estuvo chido y divertida.",
             comment: nil,
             tag: "Slang",
+            onDelete: {}
+        )
+        WordCardView(
+            word: "Chido",
+            translation: "Круто",
+            type: "adjective",
+            example: "La fiesta estuvo chido y divertida.",
+            comment: nil,
+            tag: "Chat",
             onDelete: {}
         )
     }

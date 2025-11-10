@@ -1,27 +1,21 @@
 import SwiftUI
 
 struct GoldenWordsSkeletonView: View {
-    private let gold = Color(hex: "#FFC107")
-    private let lightGold = Color(hex: "#FFE082")
-    private let darkGold = Color(hex: "#E0A600")
-
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            VStack(spacing: 16) {
-                ForEach(0..<2) { _ in
-                    GoldenWordSkeletonCard()
-                }
+            ForEach(0..<2) { _ in
+                GoldenWordSkeletonCard()
             }
-            .frame(maxWidth: .infinity)
         }
         .padding(.bottom, 8)
     }
 }
 
 struct GoldenWordSkeletonCard: View {
-    private let gold = Color(hex: "#FFC107")
-    private let lightGold = Color(hex: "#FFE082")
-    private let darkGold = Color(hex: "#E0A600")
+    private let baseGold = Color(hex: "#FCDD9D")
+    private let softGold = Color(hex: "#FFEBC8")
+    private let warmBeige = Color(hex: "#F9DDA8")
+    private let shadowGold = Color(hex: "#E6B965")
 
     @State private var shimmerPhase: CGFloat = -1.0
 
@@ -33,7 +27,7 @@ struct GoldenWordSkeletonCard: View {
                 .goldShimmer(phase: shimmerPhase)
 
             RoundedRectangle(cornerRadius: 7)
-                .fill(Color.white.opacity(0.65))
+                .fill(Color.white.opacity(0.6))
                 .frame(width: 90, height: 18)
                 .goldShimmer(phase: shimmerPhase)
 
@@ -61,11 +55,17 @@ struct GoldenWordSkeletonCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(gold.gradientBackground())
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [softGold, baseGold, warmBeige]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
         )
-        .shadow(color: darkGold.opacity(0.18), radius: 10, y: 3)
+        .shadow(color: shadowGold.opacity(0.25), radius: 10, y: 3)
         .onAppear {
-            withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
+            withAnimation(.linear(duration: 1.4).repeatForever(autoreverses: false)) {
                 shimmerPhase = 2.0
             }
         }
@@ -78,11 +78,11 @@ extension View {
             GeometryReader { geo in
                 let gradient = LinearGradient(
                     gradient: Gradient(colors: [
-                        Color.clear,
-                        Color.white.opacity(0.55),
-                        Color(hex: "#FFF8E1").opacity(0.92),
-                        Color.white.opacity(0.55),
-                        Color.clear
+                        .clear,
+                        Color.white.opacity(0.5),
+                        Color(hex: "#FFF8E1").opacity(0.9),
+                        Color.white.opacity(0.5),
+                        .clear
                     ]),
                     startPoint: .leading,
                     endPoint: .trailing
@@ -95,26 +95,11 @@ extension View {
                     .mask(self)
             }
         )
-        .animation(.linear(duration: 1.3).repeatForever(autoreverses: false), value: phase)
+        .animation(.linear(duration: 1.4).repeatForever(autoreverses: false), value: phase)
     }
 }
 
-extension Color {
-    func gradientBackground() -> LinearGradient {
-        LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "#FFE082"),
-                Color(hex: "#FFC107"),
-                Color(hex: "#FFD54F"),
-                Color(hex: "#E0A600")
-            ]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-}
-
-#Preview("Golden Skeleton") {
+#Preview("Soft Golden Skeleton") {
     GoldenWordsSkeletonView()
         .background(Color(.systemGroupedBackground))
 }

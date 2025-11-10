@@ -45,20 +45,12 @@ struct ProfileHeaderView: View {
         max(0, wordsForCurrentLevel - wordsProgressInLevel)
     }
 
-    private var levelColor: Color {
-        switch level {
-        case 1...5:  return Color(hexRGB: 0xFFDFA4)
-        case 6...10: return Color(hexRGB: 0xC6F6D5)
-        case 11...20: return Color(hexRGB: 0xB9E3FF)
-        case 21...30: return Color(hexRGB: 0xE4D2FF)
-        case 31...40: return Color(hexRGB: 0xFFC6C9)
-        case 41...50: return Color(hexRGB: 0xFFF1B2)
-        default:      return Color(hexRGB: 0xBDF4F2)
-        }
-    }
+    private let levelBackground = Color(hex: "#FFE6AA")
+    private let levelText = Color(hex: "#9C6B00")
 
-    private let goldText = Color(hexRGB: 0xB88A00)
-    private let goldBackground = Color(hexRGB: 0xFFF1B2)
+    private let xpBackground = Color(hex: "#DEF1D0")
+    private let xpText = Color(hex: "#3E8A64")
+
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -70,15 +62,15 @@ struct ProfileHeaderView: View {
                             .scaledToFill()
                             .frame(width: 72, height: 72)
                             .clipShape(Circle())
-                            .overlay(Circle().stroke(levelColor, lineWidth: 3))
+                            .overlay(Circle().stroke(levelBackground, lineWidth: 3))
                     } else {
                         Circle()
-                            .fill(levelColor.opacity(0.25))
+                            .fill(levelBackground.opacity(0.25))
                             .frame(width: 72, height: 72)
                             .overlay(
                                 Image(systemName: "person.fill")
                                     .font(.system(size: 34, weight: .semibold))
-                                    .foregroundColor(Color(.mainBlack))
+                                    .foregroundColor(.mainBlack)
                             )
                     }
                 }
@@ -88,31 +80,32 @@ struct ProfileHeaderView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Yura")
                         .font(.custom("Poppins-Bold", size: 22))
-                        .foregroundColor(Color(.mainBlack))
+                        .foregroundColor(.mainBlack)
 
                     HStack(spacing: 10) {
                         Label("Lv \(level)", systemImage: "star.fill")
                             .font(.custom("Poppins-Bold", size: 13))
-                            .foregroundColor(Color(darkerShade(of: levelColor, by: 0.35)))
+                            .foregroundColor(levelText)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 4)
-                            .background(Capsule().fill(levelColor))
+                            .background(Capsule().fill(levelBackground))
 
                         Label("\(totalXP) XP", systemImage: "bolt.fill")
                             .font(.custom("Poppins-Bold", size: 13))
-                            .foregroundColor(goldText)
+                            .foregroundColor(xpText)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 4)
-                            .background(Capsule().fill(goldBackground))
+                            .background(Capsule().fill(xpBackground))
                     }
                 }
+
                 Spacer()
             }
 
             VStack(alignment: .leading, spacing: 6) {
                 ZStack(alignment: .leading) {
                     Capsule()
-                        .fill(Color("MainGrey").opacity(0.15))
+                        .fill(.divider)
                         .frame(height: 16)
 
                     Capsule()
@@ -139,7 +132,7 @@ struct ProfileHeaderView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 24)
-                .fill(Color.settingsBackground)
+                .fill(Color.defaultCard)
         )
         .padding(.horizontal)
         .sheet(isPresented: $showSettings) {

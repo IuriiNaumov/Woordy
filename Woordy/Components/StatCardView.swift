@@ -3,36 +3,63 @@ import SwiftUI
 struct StatCardView: View {
     let title: String
     let value: String
-    var color: Color = Color(hexRGB: 0xE4D2FF)
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var baseColor: Color {
+        colorScheme == .dark ? Color(hex: "#6F68A8") : Color(hex: "#CBCDEA")
+    }
+
+    private var textColor: Color {
+        darkerShade(of: baseColor, by: colorScheme == .dark ? 0.3 : 0.4)
+    }
 
     var body: some View {
         VStack(spacing: 6) {
             Text(value)
                 .font(.custom("Poppins-Bold", size: 22))
-                .foregroundColor(.statsNumber)
+                .foregroundColor(textColor)
 
             Text(title)
                 .font(.custom("Poppins-Medium", size: 13))
-                .foregroundColor(.gray)
+                .foregroundColor(textColor.opacity(0.75))
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 14)
+        .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(color.opacity(0.25))
+                .fill(baseColor.opacity(colorScheme == .dark ? 0.9 : 1.0))
         )
-
+        .shadow(
+            color: baseColor.opacity(colorScheme == .dark ? 0.25 : 0.4),
+            radius: colorScheme == .dark ? 6 : 8,
+            y: colorScheme == .dark ? 3 : 4
+        )
         .scaleEffect(1.02)
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: value)
     }
 }
 
 #Preview {
-    HStack(spacing: 20) {
-        StatCardView(title: "Total", value: "123", color: Color(hexRGB: 0xFFDFA4))
-        StatCardView(title: "Today", value: "5", color: Color(hexRGB: 0xC6F6D5))
-        StatCardView(title: "Last 7 days", value: "28", color: Color(hexRGB: 0xB9E3FF))
+    VStack(spacing: 16) {
+        HStack(spacing: 16) {
+            StatCardView(title: "Total", value: "123")
+            StatCardView(title: "Today", value: "5")
+        }
+
+        StatCardView(title: "Last 7 days", value: "28")
     }
     .padding()
-    .background(Color(.appBackground))
+    .preferredColorScheme(.light)
+
+    VStack(spacing: 16) {
+        HStack(spacing: 16) {
+            StatCardView(title: "Total", value: "123")
+            StatCardView(title: "Today", value: "5")
+        }
+
+        StatCardView(title: "Last 7 days", value: "28")
+    }
+    .padding()
+    .preferredColorScheme(.dark)
 }

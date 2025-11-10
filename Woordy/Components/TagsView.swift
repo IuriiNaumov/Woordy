@@ -7,14 +7,11 @@ struct TagsView: View {
     var hasGoldenWords: Bool = false
 
     static let allTags: [(name: String, color: Color)] = [
-        ("Golden", Color(hexRGB: 0xFFC107)),
-        ("Social", Color(hexRGB: 0xFFDFA4)),
-        ("Chat",   Color(hexRGB: 0xB9E3FF)),
-        ("Apps",   Color(hexRGB: 0xC6F6D5)),
-        ("Street", Color(hexRGB: 0xFFC6C9)),
-        ("Movies", Color(hexRGB: 0xE4D2FF)),
-        ("Travel", Color(hexRGB: 0xFFF1B2)),
-        ("Work",   Color(hexRGB: 0xBDF4F2)),
+        ("Golden", Color(hexRGB: 0xFCDD9D)),
+        ("Chat",   Color(hexRGB: 0xCDEBF1)),
+        ("Travel", Color(hexRGB: 0xDEF1D0)),
+        ("Street", Color(hexRGB: 0xF8E5E5)),
+        ("Movies", Color(hexRGB: 0xCBCEEA)),
     ]
 
     var visibleTags: [(name: String, color: Color)] {

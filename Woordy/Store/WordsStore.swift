@@ -10,6 +10,8 @@ struct StoredWord: Identifiable, Codable, Equatable {
     var comment: String?
     var tag: String?
     var dateAdded: Date = Date()
+    var fromLanguage: String
+    var toLanguage: String
 
     init(
         id: UUID = UUID(),
@@ -19,7 +21,9 @@ struct StoredWord: Identifiable, Codable, Equatable {
         example: String?,
         comment: String? = nil,
         tag: String? = nil,
-        dateAdded: Date = Date()
+        dateAdded: Date = Date(),
+        fromLanguage: String,
+        toLanguage: String
     ) {
         self.id = id
         self.word = word
@@ -29,8 +33,11 @@ struct StoredWord: Identifiable, Codable, Equatable {
         self.comment = comment
         self.tag = tag
         self.dateAdded = dateAdded
+        self.fromLanguage = fromLanguage
+        self.toLanguage = toLanguage
     }
 }
+
 
 final class WordsStore: ObservableObject {
     @Published private(set) var words: [StoredWord] = [] {

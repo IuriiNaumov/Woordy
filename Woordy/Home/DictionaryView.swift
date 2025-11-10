@@ -16,7 +16,7 @@ struct DictionaryView: View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
                 Text("Dictionary")
-                    .font(.custom("Poppins-Bold", size: 34))
+                    .font(.custom("Poppins-Bold", size: 38))
                     .foregroundColor(.mainBlack)
                     .padding(.top, 8)
                     .padding(.horizontal, horizontalPadding)
@@ -50,7 +50,7 @@ struct DictionaryView: View {
                 .padding(.horizontal, horizontalPadding)
                 .padding(.bottom, 40)
             }
-        }
+        }.background(Color(.appBackground))
         .onAppear {
             recalculateFiltered()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {

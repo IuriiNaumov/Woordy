@@ -8,14 +8,14 @@ final class GoldenWordsStore: ObservableObject {
     @Published var topic: String? = nil
     @Published var isLoading = false
 
-    func fetchSuggestions(basedOn words: [StoredWord]) async {
+    func fetchSuggestions(basedOn words: [StoredWord], languageStore: LanguageStore) async {
         guard !words.isEmpty else { return }
         isLoading = true
         defer { isLoading = false }
 
         do {
             let baseWords = words.map { $0.word }
-            let result = try await fetchSuggestionsWithTopic(words: baseWords)
+            let result = try await fetchSuggestionsWithTopic(words: baseWords, languageStore: languageStore)
             self.topic = result.topic
             self.goldenWords = result.suggestions
         } catch {
@@ -24,13 +24,16 @@ final class GoldenWordsStore: ObservableObject {
         }
     }
 
-    func accept(_ word: SuggestedWord, store: WordsStore) {
+    func accept(_ word: SuggestedWord, store: WordsStore, languageStore: LanguageStore) {
         let newWord = StoredWord(
             word: word.word,
             type: word.type ?? "существительное",
             translation: word.translation,
             example: word.example ?? "—",
-            tag: "Golden"
+            comment: nil,
+            tag: "Golden",
+            fromLanguage: languageStore.nativeLanguage,
+            toLanguage: languageStore.learningLanguage
         )
         store.add(newWord)
         goldenWords.removeAll { $0.id == word.id }

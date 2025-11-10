@@ -74,7 +74,7 @@ struct HomeView: View {
         .onChange(of: store.words.count) { _, newValue in
             if newValue > 0, newValue % 5 == 0, newValue != lastGoldenTrigger {
                 Task {
-                    await golden.fetchSuggestions(basedOn: store.words)
+                    await golden.fetchSuggestions(basedOn: store.words, languageStore: LanguageStore())
                 }
                 lastGoldenTrigger = newValue
             }
@@ -119,7 +119,7 @@ struct HomeView: View {
                 }
             }
             .padding(.bottom, 60)
-        }
+        }.background(Color(.appBackground))
     }
 
     @ViewBuilder

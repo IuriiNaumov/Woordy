@@ -3,9 +3,12 @@ import PhotosUI
 
 struct SettingsView: View {
     @EnvironmentObject private var store: WordsStore
+    @EnvironmentObject private var languageStore: LanguageStore
+
     @State private var avatarImage: UIImage?
     @State private var showPhotoPicker = false
     @State private var selectedItem: PhotosPickerItem?
+    @State private var showLanguagePicker = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -18,9 +21,7 @@ struct SettingsView: View {
                                 .scaledToFill()
                                 .frame(width: 92, height: 92)
                                 .clipShape(Circle())
-                                .overlay(
-                                    Circle().stroke(Color.mainBlack.opacity(0.1), lineWidth: 3)
-                                )
+                                .overlay(Circle().stroke(Color.mainBlack.opacity(0.1), lineWidth: 3))
                                 .shadow(color: Color.mainBlack.opacity(0.1), radius: 6, y: 3)
                         } else {
                             Circle()
@@ -65,10 +66,14 @@ struct SettingsView: View {
                     ])
 
                     groupedSettingsSection([
-                        SettingItem(icon: "moon.fill", color: .gold, title: "Appearance", value: "System"),
-                        SettingItem(icon: "textformat.size", color: .yellow, title: "Language", value: "English"),
+                        SettingItem(icon: "moon.fill", color: .accentGold, title: "Appearance", value: "System"),
+                        SettingItem(icon: "textformat.size", color: .yellow, title: "Language", value: languageStore.learningLanguage),
                         SettingItem(icon: "bell.badge.fill", color: .pink, title: "Notifications")
-                    ])
+                    ]) { item in
+                        if item.title == "Language" {
+                            showLanguagePicker = true
+                        }
+                    }
                 }
 
                 Spacer()
@@ -76,6 +81,10 @@ struct SettingsView: View {
             .padding(.bottom, 40)
         }
         .background(Color.appBackground.ignoresSafeArea())
+        .sheet(isPresented: $showLanguagePicker) {
+            LanguageSelectionView()
+                .environmentObject(languageStore)
+        }
         .photosPicker(isPresented: $showPhotoPicker, selection: $selectedItem, matching: .images)
         .onChange(of: selectedItem) { newItem in
             guard let newItem else { return }
@@ -92,42 +101,49 @@ struct SettingsView: View {
         }
     }
 
-    private func groupedSettingsSection(_ items: [SettingItem]) -> some View {
+    private func groupedSettingsSection(
+        _ items: [SettingItem],
+        onTap: ((SettingItem) -> Void)? = nil
+    ) -> some View {
         VStack(spacing: 0) {
-            ForEach(items.indices, id: \.self) { index in
-                let item = items[index]
+            ForEach(items) { item in
+                Button {
+                    onTap?(item)
+                } label: {
+                    HStack(spacing: 16) {
+                        ZStack {
+                            Circle()
+                                .fill(item.color.opacity(0.15))
+                                .frame(width: 36, height: 36)
+                            Image(systemName: item.icon)
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(item.color)
+                        }
 
-                HStack(spacing: 16) {
-                    ZStack {
-                        Circle()
-                            .fill(item.color.opacity(0.15))
-                            .frame(width: 36, height: 36)
-                        Image(systemName: item.icon)
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(item.color)
+                        Text(item.title)
+                            .font(.custom("Poppins-Regular", size: 16))
+                            .foregroundColor(.mainBlack)
+
+                        Spacer()
+
+                        if let value = item.value {
+                            Text(value)
+                                .font(.custom("Poppins-Regular", size: 14))
+                                .foregroundColor(.mainGrey)
+                        }
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.mainGrey.opacity(0.6))
                     }
-
-                    Text(item.title)
-                        .font(.custom("Poppins-Regular", size: 16))
-                        .foregroundColor(.mainBlack)
-
-                    Spacer()
-
-                    if let value = item.value {
-                        Text(value)
-                            .font(.custom("Poppins-Regular", size: 14))
-                            .foregroundColor(.mainGrey)
-                    }
-
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.mainGrey.opacity(0.6))
+                    .padding(.vertical, 14)
+                    .padding(.horizontal, 20)
+                    .background(Color.defaultCard)
                 }
-                .padding(.vertical, 14)
-                .padding(.horizontal, 20)
-                .background(Color.settingsBackground)
+                .buttonStyle(.plain)
             }
-        }.cornerRadius(18)
+        }
+        .cornerRadius(18)
         .padding(.horizontal)
     }
 
@@ -156,10 +172,4 @@ struct SettingItem: Identifiable {
     let color: Color
     let title: String
     var value: String? = nil
-}
-
-#Preview {
-    SettingsView()
-        .environmentObject(WordsStore())
-        .preferredColorScheme(.light)
 }

@@ -3,7 +3,7 @@ import SwiftUI
 extension Color {
     static let appBackground = Color("AppBackground")
     static let settingsBackground = Color("SettingsBackground")
-    static let defaultCardColor = Color("DefaultCardColor")
+    static let defaultCard= Color("DefaultCard")
     static let cardBackground = Color("CardBackground")
     static let mainBlack = Color("MainBlack")
     static let mainGrey = Color("MainGrey")
@@ -19,3 +19,4 @@ extension Color {
     static let addButton = Color("AddButton")
     static let progressBar = Color("ProgressBar")
 }
+

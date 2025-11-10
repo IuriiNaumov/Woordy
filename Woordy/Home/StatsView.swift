@@ -44,7 +44,7 @@ struct StatsView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.settingsBackground)
+                .fill(.defaultCard)
         )
         .foregroundColor(.mainBlack)
         .padding(.horizontal)
